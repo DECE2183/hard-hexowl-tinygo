@@ -55,3 +55,4 @@ call_start_cpu0:
 tinygo_scanCurrentStack:
     // TODO: save callee saved registers on the stack
     j tinygo_scanstack
+

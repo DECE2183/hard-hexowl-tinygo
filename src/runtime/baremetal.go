@@ -6,19 +6,19 @@ import (
 	"unsafe"
 )
 
-//go:extern _heap_start
+//go:extern _bss_end
 var heapStartSymbol [0]byte
 
 //go:extern _heap_end
 var heapEndSymbol [0]byte
 
-//go:extern _globals_start
+//go:extern _data_start
 var globalsStartSymbol [0]byte
 
-//go:extern _globals_end
+//go:extern _bss_end
 var globalsEndSymbol [0]byte
 
-//go:extern _stack_top
+//go:extern call_start_cpu0
 var stackTopSymbol [0]byte
 
 var (
@@ -36,20 +36,17 @@ func growHeap() bool {
 	return false
 }
 
-//export malloc
 func libc_malloc(size uintptr) unsafe.Pointer {
 	// Note: this zeroes the returned buffer which is not necessary.
 	// The same goes for bytealg.MakeNoZero.
-	return alloc(size, nil)
+	return malloc(size)
 }
 
-//export calloc
 func libc_calloc(nmemb, size uintptr) unsafe.Pointer {
 	// No difference between calloc and malloc.
 	return libc_malloc(nmemb * size)
 }
 
-//export free
 func libc_free(ptr unsafe.Pointer) {
 	free(ptr)
 }

@@ -1,4 +1,5 @@
-//go:build scheduler.none
+//go:build lib
+// +build lib
 
 package runtime
 
@@ -9,12 +10,6 @@ func sleep(duration int64) {
 	}
 
 	sleepTicks(nanosecondsToTicks(duration))
-}
-
-// getSystemStackPointer returns the current stack pointer of the system stack.
-// This is always the current stack pointer.
-func getSystemStackPointer() uintptr {
-	return getCurrentStackPointer()
 }
 
 // run is called by the program entry point to execute the go program.

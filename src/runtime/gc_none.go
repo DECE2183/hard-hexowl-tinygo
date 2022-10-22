@@ -18,7 +18,8 @@ func alloc(size uintptr, layout unsafe.Pointer) unsafe.Pointer
 
 func realloc(ptr unsafe.Pointer, size uintptr) unsafe.Pointer
 
-func free(ptr unsafe.Pointer) {
+//extern free
+func _free(ptr unsafe.Pointer) {
 	// Nothing to free when nothing gets allocated.
 }
 

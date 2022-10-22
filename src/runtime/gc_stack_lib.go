@@ -1,10 +1,11 @@
-//go:build (gc.conservative || gc.precise) && !tinygo.wasm
+//go:build gc.conservative && lib
+// +build gc.conservative,lib
 
 package runtime
 
 import (
-	"internal/task"
 	"unsafe"
+	"internal/task"
 )
 
 type freeRTOSTaskTCB struct {

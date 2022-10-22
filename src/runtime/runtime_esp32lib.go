@@ -1,4 +1,5 @@
-//go:build esp32
+//go:build esp32 && lib
+// +build esp32,lib
 
 package runtime
 
