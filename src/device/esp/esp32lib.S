@@ -3,5 +3,6 @@
 .global tinygo_scanCurrentStack
 tinygo_scanCurrentStack:
     // TODO: save callee saved registers on the stack
-    j tinygo_scanstack
+    movi a3, tinygo_scanstack
+    jx a3
 
