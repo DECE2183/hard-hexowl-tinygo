@@ -1,6 +1,3 @@
-//go:build !lib
-// +build lib
-
 package runtime
 
 import (

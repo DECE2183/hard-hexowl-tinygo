@@ -55,6 +55,7 @@ var (
 	gcTotalAlloc  uint64         // total number of bytes allocated
 	gcMallocs     uint64         // total number of allocations
 	gcFrees       uint64         // total number of objects freed
+	totalHeapSize uintptr
 )
 
 // zeroSizedAlloc is just a sentinel that gets returned when allocating 0 bytes.
@@ -195,7 +196,8 @@ func isOnHeap(ptr uintptr) bool {
 // No memory may be allocated before this is called. That means the runtime and
 // any packages the runtime depends upon may not allocate memory during package
 // initialization.
-func initHeap() {
+func initHeap(heapSize uintptr) {
+	totalHeapSize = heapSize
 	calculateHeapAddresses()
 
 	// Set all block states to 'free'.
@@ -240,7 +242,10 @@ func setHeapEnd(newHeapEnd uintptr) {
 // This function can be called again when the heap size increases. The caller is
 // responsible for copying the metadata to the new location.
 func calculateHeapAddresses() {
-	totalSize := heapEnd - heapStart
+	// Allocate a 128KB of memory in heap managed by C runtime
+	totalSize := totalHeapSize
+	heapStart = uintptr(malloc(totalSize))
+	heapEnd = heapStart + totalSize
 
 	// Allocate some memory to keep 2 bits of information about every block.
 	metadataSize := (totalSize + blocksPerStateByte*bytesPerBlock) / (1 + blocksPerStateByte*bytesPerBlock)
@@ -401,9 +406,9 @@ func realloc(ptr unsafe.Pointer, size uintptr) unsafe.Pointer {
 	return newAlloc
 }
 
-func free(ptr unsafe.Pointer) {
-	// TODO: free blocks on request, when the compiler knows they're unused.
-}
+//extern free
+//go:linkname free runtime.free
+func free(ptr unsafe.Pointer)
 
 // GC performs a garbage collection cycle.
 func GC() {

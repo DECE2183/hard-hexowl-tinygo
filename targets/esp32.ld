@@ -42,7 +42,7 @@ SECTIONS
     {
         . = ALIGN(16);
         . += _stack_size;
-        port_IntStackTop = .;
+        _stack_top = .;
     } >DRAM
 
     /* Constant global variables.
@@ -60,10 +60,10 @@ SECTIONS
      */
     .data : ALIGN(4)
     {
-        _data_start = ABSOLUTE(.);
+        _sdata = ABSOLUTE(.);
         *(.data)
         *(.data.*)
-        _data_end = ABSOLUTE(.);
+        _edata = ABSOLUTE(.);
     } >DRAM
 
     /* Check that the boot ROM stack (for the APP CPU) does not overlap with the
@@ -71,7 +71,7 @@ SECTIONS
      * issue if it occurs in practice.
      * The magic value here is _stack_sentry in the boot ROM ELF file.
      */
-    ASSERT(_data_end < 0x3ffe1320, "the .data section overlaps with the stack used by the boot ROM, possibly causing corruption at startup")
+    ASSERT(_edata < 0x3ffe1320, "the .data section overlaps with the stack used by the boot ROM, possibly causing corruption at startup")
 
     /* Global variables that are mutable and zero-initialized.
      * These must be zeroed at startup (unlike data, which is loaded by the
@@ -80,19 +80,19 @@ SECTIONS
     .bss (NOLOAD) : ALIGN(4)
     {
         . = ALIGN (4);
-        _bss_start = ABSOLUTE(.);
+        _sbss = ABSOLUTE(.);
         *(.bss)
         *(.bss.*)
         . = ALIGN (4);
-        _bss_end = ABSOLUTE(.);
+        _ebss = ABSOLUTE(.);
     } >DRAM
 }
 
 /* For the garbage collector.
  */
-_globals_start = _data_start;
-_globals_end = _bss_start;
-_heap_start = _bss_end;
+_globals_start = _sdata;
+_globals_end = _ebss;
+_heap_start = _ebss;
 _heap_end = ORIGIN(DRAM) + LENGTH(DRAM);
 
 _stack_size = 4K;
